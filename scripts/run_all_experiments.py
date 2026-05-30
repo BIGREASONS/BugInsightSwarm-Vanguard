@@ -199,7 +199,7 @@ def main() -> None:
     from evaluation.statistics import generate_table1, compare_models
 
     metrics_dir = config.get_path("outputs.metrics_dir")
-    table_path = config.get_path("outputs.figures_dir") / "table1"
+    table_path = config.get_path("outputs.figures_dir") / "table1.csv"
     generate_table1(str(metrics_dir), str(table_path))
 
     # -----------------------------------------------------------------------
