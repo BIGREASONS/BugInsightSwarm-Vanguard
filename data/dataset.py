@@ -320,9 +320,9 @@ def create_data_loaders(
 def get_text_data(
     config: Optional[Config] = None,
 ) -> Tuple[
-    Tuple[List[str], List[int]],
-    Tuple[List[str], List[int]],
-    Tuple[List[str], List[int]],
+    Tuple[List[str], List[str]],
+    Tuple[List[str], List[str]],
+    Tuple[List[str], List[str]],
 ]:
     """Return (texts, labels) tuples for classical ML (TF-IDF) pipelines.
 
@@ -361,10 +361,10 @@ def get_text_data(
     # Build (texts, labels) for each split
     def _extract(
         split_df: pd.DataFrame,
-    ) -> Tuple[List[str], List[int]]:
+    ) -> Tuple[List[str], List[str]]:
         texts = split_df.apply(_combine_text, axis=1).tolist()
-        labels_arr, _ = _encode_labels(split_df["severity"], label_order)
-        return texts, labels_arr.tolist()
+        labels = split_df["severity"].tolist()
+        return texts, labels
 
     train_data = _extract(train_df)
     val_data = _extract(val_df)
