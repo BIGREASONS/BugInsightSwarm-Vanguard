@@ -1,153 +1,94 @@
-# BugInsight AI
+# BugInsight Swarm 🐝
 
-**Research-grade platform for automated bug severity prediction, explainable AI, and evolutionary neural architecture search in software engineering.**
+**Microsoft Build AI 2026 Hackathon Submission**
+**Theme:** AI-Powered Production Function
 
-[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+BugInsight Swarm is an autonomous, multi-agent AI system designed to eliminate the engineering bottleneck of triaging and fixing repository-wide bugs. By ingesting a GitHub issue, BugInsight dynamically clones the repository, semantically indexes its contents, predicts the severity of the bug, isolates the root cause, and generates a PR-ready patch—all orchestrated through a real-time event stream.
 
 ---
 
-## Research Question
+## 🏗️ Architecture
 
-> *Can evolutionary architecture search, knowledge transfer, contrastive learning, and retrieval augmentation automatically build superior bug-analysis systems across diverse software projects?*
+BugInsight leverages a 6-agent LangGraph workflow backed by specialized models.
 
-## Quick Start
+```mermaid
+graph TD
+    A[User / Next.js Dashboard] -->|Submit GitHub URL & Issue| B(FastAPI Backend)
+    B --> C{LangGraph Swarm}
+    
+    subgraph LangGraph Orchestration
+        C --> D[1. Repository Agent]
+        D --> E[2. Severity Agent]
+        E --> F[3. Root Cause Agent]
+        F --> G[4. Fix Agent]
+        G --> H[5. GitHub Agent]
+        H --> I[6. Sprint Agent]
+    end
+    
+    D <--> J[(ChromaDB Cache)]
+    D --> K[Git Clone & Chunking]
+    
+    E <--> L((Fine-Tuned CodeBERT))
+    
+    F <--> M((Ollama Qwen2.5-Coder))
+    G <--> M
+    I <--> M
+    
+    H <--> N[GitHub API / Mock Mode]
+    
+    C -->|Server-Sent Events Stream| A
+```
 
-### 1. Clone & Install
+### The Swarm Agents
+1. **Repository Agent:** Performs a `git clone`, chunks source code, and semantically indexes the entire repository into ChromaDB. Built with a high-performance **Repository Cache** that reduces repeat analysis from minutes to milliseconds.
+2. **Severity Agent:** Interfaces with a custom-trained **CodeBERT** model to predict the critical severity (P0-P4) of the issue.
+3. **Root Cause Agent:** Uses **Qwen2.5-Coder** via local Ollama to ingest the semantic search context and deduce the exact file and lines causing the bug.
+4. **Fix Agent:** Generates a targeted, PR-ready `git diff` patch.
+5. **GitHub Agent:** Opens an actual Pull Request via the GitHub API (or operates in mock mode).
+6. **Sprint Agent:** Calculates estimated developer time saved and assigns Agile story points.
 
+## 🚀 Key Features
+
+* **Dynamic Repository Indexing:** Point BugInsight at *any* public repository. It clones it on the fly and builds a semantic understanding of the codebase.
+* **Intelligent Caching:** Hashing algorithms ensure that once a repository is cloned and embedded into ChromaDB, subsequent analyses are near-instantaneous.
+* **Real-time SSE Dashboard:** A sleek Next.js frontend built with React Strict Mode safety to stream agent completions, patch generation, and CodeBERT predictions in real-time.
+* **100% Local Inferencing Capability:** Capable of running entirely on local hardware (Ollama + local PyTorch models) for maximum security and privacy.
+
+## 💻 Tech Stack
+
+* **Frontend:** Next.js (App Router), React, Tailwind CSS
+* **Backend:** FastAPI, Server-Sent Events (SSE), Uvicorn
+* **Orchestration:** LangGraph
+* **AI/ML:** PyTorch, HuggingFace (CodeBERT), Ollama (Qwen2.5-Coder:7b)
+* **Vector Store:** ChromaDB (SentenceTransformers)
+
+## 🏁 Getting Started
+
+### Prerequisites
+* Python 3.10+
+* Node.js 18+
+* Ollama installed and running (`qwen2.5-coder:7b` pulled)
+
+### 1. Start the Backend
 ```bash
-git clone https://github.com/YOUR_USERNAME/buginsight-ai.git
-cd buginsight-ai
+# Start Ollama (if not already running as a service)
+ollama serve
+
+# Install python dependencies
 pip install -r requirements.txt
+
+# Start the FastAPI server
+python -m uvicorn swarm.api:app --host 0.0.0.0 --port 8000
 ```
 
-### 2. Prepare Dataset
-
+### 2. Start the Frontend
 ```bash
-# Generate synthetic data for smoke testing
-python scripts/generate_synthetic_data.py
-
-# Preprocess raw data into standardised format
-python -m data.preprocess
+cd frontend
+npm install
+npm run dev
 ```
 
-### 3. Run All Baseline Experiments (E1)
-
-```bash
-# Train RF, XGBoost, BiLSTM, CodeBERT across 5 seeds
-python scripts/run_all_experiments.py
-
-# Train a single model with a specific seed
-python training/train_codebert.py --seed 42
-python training/train_bilstm.py --seed 42
-```
-
-### 4. Evaluate
-
-```bash
-python evaluate.py --model codebert --seed 42
-```
-
-### 5. Generate Table 1
-
-```bash
-python scripts/run_all_experiments.py --skip-training
-```
+Navigate to `http://localhost:3000` to launch the Swarm.
 
 ---
-
-## Cloud Training (Kaggle)
-
-1. Push this repository to GitHub
-2. Open Kaggle and create a new notebook
-3. Upload `notebooks/kaggle_baseline.ipynb`
-4. Enable **GPU T4 x2**
-5. Run all cells
-6. Close your laptop — training continues in the cloud
-7. Return later and download results from `outputs/`
-
----
-
-## Repository Structure
-
-```
-buginsight-ai/
-├── configs/               # config.yaml + config loader
-├── data/                  # Dataset pipeline (preprocess, tokenize, split)
-├── docs/                  # threats_to_validity.md, dataset_report.md
-├── evaluation/            # Metrics computation, statistical tests, Table 1
-├── models/                # RF, XGBoost, BiLSTM, CodeBERT classifiers
-├── notebooks/             # Kaggle & Colab automation notebooks
-├── outputs/               # metrics/, models/, logs/, figures/
-├── scripts/               # Experiment runners, data generators
-├── tests/                 # pytest unit & integration tests
-├── training/              # Training loops, per-model training scripts
-├── evaluate.py            # Unified evaluation entry point
-├── utils.py               # Seeding, logging, device detection
-├── requirements.txt       # Python dependencies
-└── README.md              # This file
-```
-
----
-
-## Experiment Matrix
-
-| Experiment | Purpose | Phase |
-|:-----------|:--------|:------|
-| **E1** | RF vs XGBoost vs BiLSTM vs CodeBERT | Phase 1 |
-| **E2** | CodeBERT vs CodeBERT + Retrieval | Phase 2 |
-| **E3** | CodeBERT vs CodeBERT + KICL | Phase 5 |
-| **E4** | Manual Architecture vs NAS | Phase 6 |
-| **E5** | Cold Start NAS vs Transfer NAS | Phase 7 |
-| **E6** | Transfer NAS vs Self-Improving Memory NAS | Phase 8 |
-| **E7** | Full System Ablation | Phase 9 |
-| **E8** | Cross-Project Validation | Phase 9 |
-
----
-
-## Statistical Rigour
-
-- All experiments use **5 random seeds** (42, 123, 456, 789, 999)
-- Results reported as **Mean ± Std**
-- Statistical significance via **paired t-test** and **Wilcoxon signed-rank test**
-- Threats to validity tracked in [`docs/threats_to_validity.md`](docs/threats_to_validity.md)
-
----
-
-## Phase 1 Target Output: Table 1
-
-| Model | Accuracy | Precision | Recall | F1 |
-|:------|:---------|:----------|:-------|:---|
-| Random Forest | — | — | — | — |
-| XGBoost | — | — | — | — |
-| BiLSTM | — | — | — | — |
-| CodeBERT | — | — | — | — |
-
-*All values: Mean ± Std across 5 seeds.*
-
----
-
-## Configuration
-
-All hyperparameters, paths, and settings are in [`configs/config.yaml`](configs/config.yaml). No hardcoded values exist in the codebase.
-
----
-
-## License
-
-MIT License. See [LICENSE](LICENSE) for details.
-
----
-
-## Citation
-
-If you use BugInsight AI in your research, please cite:
-
-```bibtex
-@software{buginsight2026,
-  title={BugInsight AI: Evolutionary Architecture Search for Bug Severity Prediction},
-  author={Singh},
-  year={2026},
-  url={https://github.com/YOUR_USERNAME/buginsight-ai}
-}
-```
+*Built with ❤️ for Microsoft Build AI 2026*
