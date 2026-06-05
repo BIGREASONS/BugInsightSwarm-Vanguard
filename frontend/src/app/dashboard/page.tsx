@@ -237,7 +237,7 @@ function DashboardContent() {
             Bug<span className="text-indigo-400">Insight</span> Swarm
           </a>
           <span className="text-xs text-zinc-500 font-mono bg-zinc-900 px-2 py-0.5 rounded">
-            {jobId}
+            Session: {jobId}
           </span>
         </div>
         <div className="flex items-center gap-4 text-sm text-zinc-400">
@@ -447,7 +447,7 @@ function DashboardContent() {
                     <span className="text-red-500">❌</span> Vulnerable Code
                   </h3>
                   <div className="relative group flex-1">
-                    <pre className="text-sm text-red-300 bg-red-950/20 border border-red-900/30 p-4 rounded-xl overflow-x-auto whitespace-pre-wrap font-mono max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-700 h-full">
+                    <pre className="text-sm text-red-300 bg-red-950/20 border border-red-900/30 p-4 rounded-xl overflow-x-auto whitespace-pre-wrap font-mono max-h-[250px] overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-700 h-full">
                       {results.vulnerable_code}
                     </pre>
                   </div>
@@ -462,7 +462,7 @@ function DashboardContent() {
                   </h3>
                   {results.fix_summary && <p className="text-sm text-zinc-400 mb-3">{results.fix_summary}</p>}
                   <div className="relative group flex-1">
-                    <pre className="text-sm text-green-300 bg-green-950/20 border border-green-900/30 p-4 rounded-xl overflow-x-auto whitespace-pre-wrap font-mono max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-700 h-full">
+                    <pre className="text-sm text-green-300 bg-green-950/20 border border-green-900/30 p-4 rounded-xl overflow-x-auto whitespace-pre-wrap font-mono max-h-[250px] overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-700 h-full">
                       {results.patched_code}
                     </pre>
                   </div>
@@ -531,8 +531,8 @@ function DashboardContent() {
                     {rawPrUrl}
                   </a>
                 ) : (
-                  <span className="text-sm text-zinc-400 font-mono break-all">
-                    {rawPrUrl.startsWith("mock://") ? rawPrUrl : `mock://buginsight/pr/${jobId?.slice(0, 6)}`}
+                  <span className="text-sm text-zinc-400 font-medium">
+                    Mock Pull Request Generated (Ready for GitHub)
                   </span>
                 )}
               </div>
