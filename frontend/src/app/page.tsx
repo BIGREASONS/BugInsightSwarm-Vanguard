@@ -64,12 +64,21 @@ export default function LandingPage() {
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Repo URL */}
           <div className="space-y-2">
-            <label
-              htmlFor="repo-url"
-              className="block text-sm font-medium text-zinc-300"
-            >
-              GitHub Repository URL
-            </label>
+            <div className="flex items-center justify-between">
+              <label
+                htmlFor="repo-url"
+                className="block text-sm font-medium text-zinc-300"
+              >
+                GitHub Repository URL
+              </label>
+              <button
+                type="button"
+                onClick={() => setRepoUrl("https://github.com/BIGREASONS/BugInsightSwarm-Vanguard")}
+                className="text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition-colors"
+              >
+                Try Demo Repository
+              </button>
+            </div>
             <input
               id="repo-url"
               type="url"
@@ -141,23 +150,24 @@ export default function LandingPage() {
         </form>
 
         {/* Footer badges */}
-        <div className="flex items-center justify-center gap-4 text-xs text-zinc-500">
-          <span className="inline-flex items-center gap-1.5">
-            <span className="h-1.5 w-1.5 rounded-full bg-indigo-500" />
-            CodeBERT
-          </span>
-          <span className="inline-flex items-center gap-1.5">
-            <span className="h-1.5 w-1.5 rounded-full bg-indigo-500" />
-            LangGraph
-          </span>
-          <span className="inline-flex items-center gap-1.5">
-            <span className="h-1.5 w-1.5 rounded-full bg-indigo-500" />
-            Ollama
-          </span>
-          <span className="inline-flex items-center gap-1.5">
-            <span className="h-1.5 w-1.5 rounded-full bg-indigo-500" />
-            ChromaDB
-          </span>
+        <div className="flex flex-col items-center justify-center gap-6 mt-8">
+          <div className="flex items-center justify-center gap-4 text-xs text-zinc-500">
+            <span className="inline-flex items-center gap-1.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-indigo-500" />
+              Local CodeBERT
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-indigo-500" />
+              Local Qwen 2.5 Coder
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-indigo-500" />
+              No External APIs
+            </span>
+          </div>
+          <div className="text-center text-xs text-zinc-600 font-mono tracking-widest uppercase">
+            Detect → Explain → Fix → Plan → PR
+          </div>
         </div>
       </div>
     </main>

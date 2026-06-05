@@ -263,37 +263,56 @@ function DashboardContent() {
         </div>
       )}
 
-      {/* ── Horizontal Trace Bar ── */}
-      <div className="border-b border-zinc-800 bg-zinc-950 px-6 py-3 flex items-center gap-4 overflow-x-auto whitespace-nowrap scrollbar-hide">
-        {agents.map((agent, i) => (
-          <div key={agent.name} className="flex items-center gap-3">
-            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-md border ${
-                agent.status === "complete"
-                  ? "bg-zinc-900 border-zinc-800 text-zinc-300"
-                  : agent.status === "running"
-                  ? "bg-indigo-950/50 border-indigo-500/30 text-indigo-300"
-                  : "border-transparent text-zinc-600"
-              }`}>
-              {agent.status === "complete" && (
-                <svg className="w-4 h-4 text-green-500" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                </svg>
-              )}
-              {agent.status === "running" && (
-                <span className="inline-block h-3 w-3 rounded-full border-2 border-indigo-400 border-t-transparent animate-spin" />
-              )}
-              {agent.status === "pending" && (
-                <span className="inline-block h-3 w-3 rounded border border-zinc-700 bg-zinc-800" />
-              )}
-              <span className="text-sm font-medium">{agent.name}</span>
-              {agent.status === "complete" && agent.duration !== undefined && (
-                <span className="text-xs font-mono text-zinc-500">({agent.duration}s)</span>
-              )}
-            </div>
-            {i < agents.length - 1 && <span className="text-zinc-700">→</span>}
+        {/* ── Horizontal Trace Bar ── */}
+        <div className="border-b border-zinc-800 bg-zinc-950 px-6 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-4 overflow-x-auto whitespace-nowrap scrollbar-hide flex-1">
+            {agents.map((agent, i) => (
+              <div key={agent.name} className="flex items-center gap-3">
+                <div className={`flex items-center gap-2 px-3 py-1.5 rounded-md border ${
+                    agent.status === "complete"
+                      ? "bg-zinc-900 border-zinc-800 text-zinc-300"
+                      : agent.status === "running"
+                      ? "bg-indigo-950/50 border-indigo-500/30 text-indigo-300"
+                      : "border-transparent text-zinc-600"
+                  }`}>
+                  {agent.status === "complete" && (
+                    <svg className="w-4 h-4 text-green-500" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                    </svg>
+                  )}
+                  {agent.status === "running" && (
+                    <span className="inline-block h-3 w-3 rounded-full border-2 border-indigo-400 border-t-transparent animate-spin" />
+                  )}
+                  {agent.status === "pending" && (
+                    <span className="inline-block h-3 w-3 rounded border border-zinc-700 bg-zinc-800" />
+                  )}
+                  <span className="text-sm font-medium">{agent.name}</span>
+                  {agent.status === "complete" && agent.duration !== undefined && (
+                    <span className="text-xs font-mono text-zinc-500">({agent.duration}s)</span>
+                  )}
+                </div>
+                {i < agents.length - 1 && <span className="text-zinc-700">→</span>}
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+          <div className="text-xs text-indigo-400 animate-pulse font-medium ml-4 shrink-0">
+            {done
+              ? "All agents completed successfully."
+              : currentAgent === "Repository Agent"
+              ? "🔍 Indexing repository..."
+              : currentAgent === "Severity Agent"
+              ? "🧠 Running CodeBERT analysis..."
+              : currentAgent === "Root Cause Agent"
+              ? "🎯 Locating vulnerable file..."
+              : currentAgent === "Fix Agent"
+              ? "🛠 Generating secure patch..."
+              : currentAgent === "Sprint Agent"
+              ? "📋 Creating sprint plan..."
+              : currentAgent
+              ? `Processing: ${currentAgent}…`
+              : "Connecting…"}
+          </div>
+        </div>
 
       {/* ── Main Dashboard Content ── */}
       <div className="flex-1 p-6 space-y-6 max-w-[1600px] mx-auto w-full">
@@ -338,9 +357,15 @@ function DashboardContent() {
 
           {/* Hero Severity */}
           <div className={`rounded-2xl border p-8 flex flex-col items-center justify-center text-center transition-all duration-700 ${severity ? `${severityBg} ring-2 ${severityRing} shadow-[0_0_50px_-15px_rgba(239,68,68,0.3)]` : "bg-zinc-900 border-zinc-800"}`}>
-            <div className="inline-flex items-center gap-2 rounded-full bg-zinc-950/80 border border-zinc-800 px-3 py-1 text-xs mb-6 shadow-sm">
-              <span className={`h-1.5 w-1.5 rounded-full ${severity ? severityColor.replace('text-', 'bg-') : 'bg-indigo-500'}`} />
-              <span className="text-zinc-300">Custom-Trained CodeBERT</span>
+            <div className="inline-flex flex-wrap justify-center items-center gap-2 mb-6">
+              <div className="inline-flex items-center gap-2 rounded-full bg-zinc-950/80 border border-zinc-800 px-3 py-1 text-xs shadow-sm">
+                <span className={`h-1.5 w-1.5 rounded-full ${severity ? severityColor.replace('text-', 'bg-') : 'bg-indigo-500'}`} />
+                <span className="text-zinc-300">Custom-Trained CodeBERT</span>
+              </div>
+              <div className="inline-flex items-center gap-2 rounded-full bg-zinc-950/80 border border-zinc-800 px-3 py-1 text-xs shadow-sm">
+                <span className="h-1.5 w-1.5 rounded-full bg-indigo-500" />
+                <span className="text-zinc-300">100% Local Inference</span>
+              </div>
             </div>
             {severity ? (
               <>
@@ -524,7 +549,7 @@ function DashboardContent() {
                       ? "bg-green-500/20 text-green-400 border border-green-500/30"
                       : "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30"
                   }`}>
-                  {effectivePrMode === "live" ? "LIVE PR" : "MOCK PR"}
+                  {effectivePrMode === "live" ? "LIVE PR" : "SAFE DEMO MODE"}
                 </span>
                 {effectivePrMode === "live" ? (
                   <a href={rawPrUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-indigo-400 hover:text-indigo-300 break-all font-mono hover:underline">
@@ -537,6 +562,13 @@ function DashboardContent() {
                 )}
               </div>
             </div>
+          </div>
+        )}
+
+        {/* ── Footer Value Statement ── */}
+        {done && (
+          <div className="pt-4 pb-8 text-center text-xs text-zinc-600 font-mono tracking-widest uppercase">
+            Detect → Explain → Fix → Plan → PR
           </div>
         )}
 
