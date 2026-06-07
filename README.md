@@ -49,9 +49,9 @@ graph TD
 ### The Swarm Agents
 1. **Repository Agent:** Performs a `git clone`, chunks source code, and semantically indexes the entire repository into ChromaDB. Built with a high-performance **Repository Cache**.
 2. **Scanner Agent:** Runs Semgrep and Bandit against the cloned repository to find specific vulnerable code blocks based on the user's issue.
-3. **Severity Agent:** Interfaces with a custom-trained **CodeBERT** model to predict the critical severity (P0-P4) of the issue.
+3. **Severity Agent:** Uses a CodeBERT-based semantic analysis layer to estimate issue severity and provide contextual signals for downstream agents.
 4. **Root Cause Agent:** Uses **Qwen2.5-Coder** via local Ollama to ingest the semantic search context and deduce the exact file and lines causing the bug.
-5. **Fix Agent:** Generates a full-file, context-aware replacement fix.
+5. **Fix Agent:** Generates targeted code remediations and validated pull-request-ready changes.
 6. **Validation Agent:** Provides strict Functional Preservation checks to ensure the fix safely patches the code without destroying surrounding logic or introducing secondary vulnerabilities.
 7. **Test Agent:** Generates Pytest regression tests tailored specifically for the generated patch.
 8. **Test Execute Agent:** Safely executes the generated regression tests against the patched code inside an isolated workspace.
@@ -60,6 +60,25 @@ graph TD
 11. **Sprint Agent:** Calculates estimated developer time saved and assigns Agile story points.
 
 ## 🚀 Key Features
+
+### AST-Based Surgical Window Splicing (SWS)
+
+BugInsight Swarm uses AST-Based Surgical Window Splicing (SWS) to improve patch reliability.
+
+Instead of asking a language model to regenerate an entire source file, the system extracts only the vulnerable function or localized code region, generates a focused remediation, and deterministically splices the fix back into the original file.
+
+This dramatically reduces hallucinations, preserves surrounding code, and enables reliable patch generation using local models.
+
+### Proven End-to-End Workflow
+
+During validation, BugInsight Swarm successfully:
+
+- Identified an unsafe deserialization vulnerability
+- Generated a remediation
+- Validated the fix
+- Created a GitHub Pull Request containing the proposed patch
+
+This demonstrated repository analysis, root-cause isolation, patch generation, validation, and developer handoff in a single autonomous workflow.
 
 * **Dynamic Repository Indexing:** Point BugInsight at *any* public repository. It clones it on the fly and builds a semantic understanding of the codebase.
 * **Intelligent Caching:** Hashing algorithms ensure that once a repository is cloned and embedded into ChromaDB, subsequent analyses are near-instantaneous.
